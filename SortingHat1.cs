@@ -26,6 +26,12 @@ namespace SortingHat1
 
         public IItemWithKey<TKey> GetEntryByKey(TKey keyToLookup)
         {
+            // This should stop the possible exceptions from the First() method
+            // I did not use the ? operator for clarity.
+            if(entriesToSearch != null && entriesToSearch.Count == 0)
+            {
+                return null;
+            }
             try
             {
                 return entriesToSearch.First(entry => entry.Key.Equals(keyToLookup));
@@ -35,6 +41,12 @@ namespace SortingHat1
                 // entry.Key could be null
                 // Logger.Log(nullRefEx)
                 throw nullRefEx;
+            }
+            catch (InvalidOperationException invalidOpEx)
+            {
+                // Thrown by First if collection is empty
+                // Logger.Log(invalidOpEx)
+                throw invalidOpEx;
             }
             catch (Exception ex)
             {
