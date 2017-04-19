@@ -9,28 +9,9 @@ namespace SortingHat1
         TKey Key { get; set; }
     }
 
-    
     public interface IEntryLookup<TKey>
     {
         IItemWithKey<TKey> GetEntryByKey(TKey key);
-    }
-
-    public class stringKey : IItemWithKey<string>, IEquatable<string>, IComparable<string>
-    {
-        public string Key
-        {
-            get; set;
-        }
-
-        public int CompareTo(string other)
-        {
-            return Key.CompareTo(other);
-        }
-
-        public bool Equals(string other)
-        {
-            return Key.Equals(other);
-        }
     }
 
     public class EntryLookupList<TKey> : IEntryLookup<TKey>
@@ -71,32 +52,47 @@ namespace SortingHat1
     {
         private List<TItem> entriesToSearch;
         private bool isSorted;
+        private TItem entryToSearch;
 
         public EntryLookupBinarySearch(IEnumerable<TItem> inputEntries)
         {
             // Copy required as we might want to keep existing list
-            // in exsiting order.
+            // in existing order.
             this.entriesToSearch = new List<TItem>(inputEntries);
+            this.entryToSearch = new TItem();
         }
 
         public int Compare(TItem leftItem, TItem rightItem)
         {
+            if (leftItem.Key == null && rightItem.Key == null)
+            {
+                return 0;
+            }
+            else if (leftItem.Key == null)
+            {
+                return -1;
+            }
+            else if (rightItem.Key == null)
+            {
+                return 1;
+            }
             return leftItem.Key.CompareTo(rightItem.Key);
         }
 
         public IItemWithKey<TKey> GetEntryByKey(TKey keyToLookup)
         {
-            // Sort list for proper BinarySearch operation
-            if (!isSorted)
-            {
-                entriesToSearch.Sort();
-            }
             // If we have no entries to search return null
             if (entriesToSearch.Count == 0)
             {
                 return null;
             }
-            var entryToSearch = new TItem();
+            // Sort list for proper BinarySearch operation
+            if (!isSorted)
+            {
+                entriesToSearch.Sort();
+                isSorted = true;
+            }    
+
             entryToSearch.Key = keyToLookup;
             var index = entriesToSearch.BinarySearch(entryToSearch, this);
             // If the index is not out of range return the item
@@ -150,7 +146,7 @@ namespace SortingHat1
                 }
             }
             // If we do not have a null 
-            if (keyToLookup != null)
+            if (keyToLookup != null )
             {
                 return entriesDictionary[keyToLookup];
             }
@@ -160,6 +156,14 @@ namespace SortingHat1
 
         public bool Equals(TKey leftItem, TKey rightItem)
         {
+            if (leftItem == null && rightItem == null)
+            {
+                return true;
+            }
+            else if (leftItem == null || rightItem == null)
+            {
+                return false;
+            }
             return leftItem.Equals(rightItem);
         }
 
